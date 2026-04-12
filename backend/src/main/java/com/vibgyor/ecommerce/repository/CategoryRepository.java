@@ -1,0 +1,12 @@
+package com.vibgyor.ecommerce.repository;
+
+import com.vibgyor.ecommerce.model.Category;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface CategoryRepository extends JpaRepository<Category, Integer> {
+    List<Category> findByStatusTrue(); // Only fetch active categories if needed
+}
