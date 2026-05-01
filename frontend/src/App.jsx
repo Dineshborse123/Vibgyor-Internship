@@ -1,53 +1,82 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
+
+// Pages
 import Login from './pages/Login';
 import Register from './pages/Register';
-import AdminDashboard from './pages/AdminDashboard';
-import CustomerDashboard from './pages/CustomerDashboard';
-import ProductsPage from './pages/ProductsPage';
-import CategoryDashboard from './CategoryDashboard';
+import Dashboard from './pages/Dashboard';
+import Categories from './pages/Categories';
+import AdminProducts from './pages/AdminProducts';
+import Products from './pages/Products';
+import ProductDetail from './pages/ProductDetail';
+import Cart from './pages/Cart';
+import Orders from './pages/Orders';
+import Checkout from './pages/Checkout';
+import LeaveRequests from './pages/LeaveRequests';
+import EmployeeDashboard from './pages/EmployeeDashboard';
+import ManageEmployees from './pages/ManageEmployees';
+import Wishlist from './pages/Wishlist';
+import ManageCustomers from './pages/ManageCustomers';
+import PaymentsRefunds from './pages/PaymentsRefunds';
+import ShippingTracking from './pages/ShippingTracking';
+import ReviewModeration from './pages/ReviewModeration';
+import ManageCoupons from './pages/ManageCoupons';
 
-function DummyPage({ title }) {
+// Protected Route wrapper
+const ProtectedRoute = ({ children, adminOnly = false, employeeOnly = false }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <div className="loading">Loading...</div>;
+  if (!user) return <Navigate to="/login" replace />;
+  if (adminOnly && user.role !== 'admin') return <Navigate to="/products" replace />;
+  if (employeeOnly && user.role !== 'employee') return <Navigate to="/products" replace />;
+  return children;
+};
+
+const IndexRoute = () => {
+  const { user } = useAuth();
+  if (user?.role === 'admin') return <Navigate to="/dashboard" replace />;
+  if (user?.role === 'employee') return <Navigate to="/employee-dashboard" replace />;
+  return <Navigate to="/products" replace />;
+};
+
+function AppRoutes() {
   return (
-    <div className="top-bar">
-      <div className="welcome-text">
-        <h1>{title}</h1>
-        <p>This module is under development.</p>
-      </div>
-    </div>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+        <Route index element={<IndexRoute />} />
+        <Route path="dashboard" element={<ProtectedRoute adminOnly><Dashboard /></ProtectedRoute>} />
+        <Route path="employee-dashboard" element={<ProtectedRoute employeeOnly><EmployeeDashboard /></ProtectedRoute>} />
+        <Route path="admin/staff" element={<ProtectedRoute adminOnly><ManageEmployees /></ProtectedRoute>} />
+        <Route path="categories" element={<ProtectedRoute adminOnly><Categories /></ProtectedRoute>} />
+        <Route path="admin/products" element={<ProtectedRoute adminOnly><AdminProducts /></ProtectedRoute>} />
+        <Route path="products" element={<Products />} />
+        <Route path="products/:id" element={<ProductDetail />} />
+        <Route path="cart" element={<Cart />} />
+        <Route path="wishlist" element={<Wishlist />} />
+        <Route path="orders" element={<Orders />} />
+        <Route path="checkout" element={<Checkout />} />
+        <Route path="leaves" element={<LeaveRequests />} />
+        <Route path="admin/customers" element={<ProtectedRoute adminOnly><ManageCustomers /></ProtectedRoute>} />
+        <Route path="admin/payments" element={<ProtectedRoute adminOnly><PaymentsRefunds /></ProtectedRoute>} />
+        <Route path="admin/shipping" element={<ProtectedRoute adminOnly><ShippingTracking /></ProtectedRoute>} />
+        <Route path="admin/reviews" element={<ProtectedRoute adminOnly><ReviewModeration /></ProtectedRoute>} />
+        <Route path="admin/coupons" element={<ProtectedRoute adminOnly><ManageCoupons /></ProtectedRoute>} />
+      </Route>
+    </Routes>
   );
 }
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public Auth Routes */}
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        
-        {/* Admin Secured Routes */}
-        <Route element={<Layout role="ADMIN" />}>
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/products" element={<ProductsPage />} />
-          <Route path="/categories" element={<CategoryDashboard />} />
-          <Route path="/leave-requests" element={<DummyPage title="HR Leave Requests" />} />
-          <Route path="/manage-products" element={<DummyPage title="Manage & Create Products" />} />
-        </Route>
-
-        {/* Customer Secured Routes */}
-        <Route element={<Layout role="CUSTOMER" />}>
-          <Route path="/customer" element={<CustomerDashboard />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/cart" element={<DummyPage title="Active Cart" />} />
-          <Route path="/orders" element={<DummyPage title="My Orders" />} />
-        </Route>
-        
-        {/* Wildcard Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </AuthProvider>
   );
 }
 

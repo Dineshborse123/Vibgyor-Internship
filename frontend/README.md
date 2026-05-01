@@ -1,16 +1,25 @@
-# React + Vite
+# NovaShop - Next-Gen Retail Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+NovaShop is a modern e-commerce application built with React and Vite. It provides a seamless shopping experience with real-time cart management, secure checkout, product reviews, and administrative dashboards.
 
-Currently, two official plugins are available:
+## Features
+- **User Authentication**: Secure login and registration.
+- **Product Catalog**: Browse and search through categorized products.
+- **Shopping Cart**: Real-time cart updates and wishlist management.
+- **Seamless Checkout**: Address validation, coupon code application, and integrated payment mockups.
+- **Inline Reviews**: Leave product reviews right after checkout!
+- **Admin Dashboard**: Manage inventory, view sales, and process orders.
+- **Employee Portal**: Specific dashboard for handling support requests and leave applications.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Tech Stack
+- React
+- Vite
+- Axios
+- React Router DOM
+- Custom CSS Variables (Slate/Orange Theme)
 
-## React Compiler
+## Setup
+1. `npm install`
+2. `npm run dev`
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Ready for deployment.

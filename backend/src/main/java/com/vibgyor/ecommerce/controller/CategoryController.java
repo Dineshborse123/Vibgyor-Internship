@@ -21,7 +21,7 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.createCategory(category));
     }
 
-    @GetMapping
+    @GetMapping({"", "/all"})
     public ResponseEntity<List<Category>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
@@ -42,7 +42,7 @@ public class CategoryController {
         }
     }
 
-    @DeleteMapping("/{id}/deactivate")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deactivateCategory(@PathVariable Integer id) {
         try {
             Category deactivated = categoryService.deactivateCategory(id);

@@ -1,121 +1,79 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { ShoppingCart } from 'lucide-react';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import API from '../api/axios';
 
-export default function Register() {
-  const navigate = useNavigate();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const Register = () => {
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    if (email.toLowerCase() === 'admin@shopvibe.com') {
-      setError('This email is reserved for administrators.');
-      return;
+    if (form.password !== form.confirmPassword) {
+      return setError('Passwords do not match.');
     }
-
-    // Get existing users
-    const usersStr = localStorage.getItem('shopvibe_users');
-    let users = [];
-    if (usersStr) {
-      users = JSON.parse(usersStr);
+    setLoading(true);
+    try {
+      await API.post('/auth/register', { name: form.name, email: form.email, password: form.password });
+      setSuccess('Registration successful! Redirecting to login...');
+      setTimeout(() => navigate('/login'), 2000);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
-
-    // Check if email already exists
-    if (users.find(u => u.email === email)) {
-      setError('An account with this email already exists!');
-      return;
-    }
-
-    // Save new user
-    users.push({ name, email, password });
-    localStorage.setItem('shopvibe_users', JSON.stringify(users));
-
-    alert(`Account created successfully for ${name}! Please sign in.`);
-    navigate('/');
   };
 
   return (
-    <div style={{
-      height: '100vh', 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center', 
-      background: 'var(--sidebar-bg)'
-    }}>
-      <div style={{
-        background: 'var(--card-bg)',
-        padding: '3rem',
-        borderRadius: '16px',
-        width: '420px',
-        maxWidth: '90%',
-        boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
-      }}>
-        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', marginBottom: '2rem'}}>
-          <ShoppingCart size={40} color="#4f46e5" />
-          <h1 style={{fontSize: '2rem', color: 'var(--text-dark)', fontWeight: 700}}>Create Account</h1>
-          <p style={{color: 'var(--text-muted)', fontSize: '0.9rem'}}>Join ShopVibe as a Customer</p>
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-logo">
+          <h1>⚡ NovaShop</h1>
+          <p>Join the future of retail</p>
         </div>
-        
-        {error && <div style={{background: '#fef2f2', color: '#ef4444', padding: '0.75rem', borderRadius: '8px', marginBottom: '1rem', fontSize: '0.85rem', textAlign: 'center'}}>{error}</div>}
 
-        <form onSubmit={handleRegister} style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
-          <div>
-            <label style={{display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500, color: 'var(--text-dark)'}}>Full Name</label>
-            <input 
-              type="text" 
-              required
-              placeholder="e.g. Dinesh Kumar"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              style={{
-                width: '100%', padding: '0.75rem', borderRadius: '8px', 
-                border: '1px solid var(--border-light)', fontFamily: 'inherit'
-              }}
-            />
+        {error && <div className="alert alert-error">{error}</div>}
+        {success && <div className="alert alert-success">{success}</div>}
+
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label" htmlFor="reg-name">Full Name</label>
+            <input id="reg-name" type="text" name="name" className="form-control" placeholder="John Doe" value={form.name} onChange={handleChange} required />
           </div>
-          <div>
-            <label style={{display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500, color: 'var(--text-dark)'}}>Email address</label>
-            <input 
-              type="email" 
-              required
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={{
-                width: '100%', padding: '0.75rem', borderRadius: '8px', 
-                border: '1px solid var(--border-light)', fontFamily: 'inherit'
-              }}
-            />
+          <div className="form-group">
+            <label className="form-label" htmlFor="reg-email">Email Address</label>
+            <input id="reg-email" type="email" name="email" className="form-control" placeholder="you@example.com" value={form.email} onChange={handleChange} required />
           </div>
-          <div>
-            <label style={{display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500, color: 'var(--text-dark)'}}>Password</label>
-            <input 
-              type="password" 
-              required
-              placeholder="Create a strong password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={{
-                width: '100%', padding: '0.75rem', borderRadius: '8px', 
-                border: '1px solid var(--border-light)', fontFamily: 'inherit'
-              }}
-            />
+          <div className="form-group">
+            <label className="form-label" htmlFor="reg-password">Password</label>
+            <input id="reg-password" type="password" name="password" className="form-control" placeholder="Min 6 characters" value={form.password} onChange={handleChange} required minLength={6} />
           </div>
-          
-          <button type="submit" className="btn-primary" style={{width: '100%', justifyContent: 'center', marginTop: '0.5rem', padding: '0.85rem'}}>
-            Register Now
+          <div className="form-group">
+            <label className="form-label" htmlFor="reg-confirm">Confirm Password</label>
+            <input id="reg-confirm" type="password" name="confirmPassword" className="form-control" placeholder="Repeat password" value={form.confirmPassword} onChange={handleChange} required />
+          </div>
+          <button
+            id="register-submit"
+            type="submit"
+            className="btn btn-primary btn-lg"
+            style={{ width: '100%', justifyContent: 'center', marginTop: '0.5rem' }}
+            disabled={loading}
+          >
+            {loading ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
 
-        <div style={{marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-dark)'}}>
-          Already have an account? <Link to="/" style={{color: 'var(--primary)', fontWeight: 600, textDecoration: 'none'}}>Sign In</Link>
+        <div className="auth-footer">
+          Already have an account? <Link to="/login">Sign in</Link>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default Register;

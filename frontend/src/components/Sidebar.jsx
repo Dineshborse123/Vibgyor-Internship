@@ -33,9 +33,9 @@ export default function Sidebar({ role }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-header" style={{cursor: 'pointer'}} onClick={() => navigate(isAdmin ? '/admin' : '/customer')}>
-        <ShoppingCart size={32} color="#818cf8" />
+        <div style={{ fontSize: '2rem' }}>⚡</div>
         <div className="sidebar-title">
-          <h2>ShopVibe</h2>
+          <h2>NovaShop</h2>
           <p>Ecommerce Platform</p>
         </div>
       </div>
